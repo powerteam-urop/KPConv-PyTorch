@@ -125,7 +125,6 @@ class DALESDataset(PointCloudDataset):
         # Load ply files
         ################
 
-
         # List of training files
         self.files = []
 
@@ -602,7 +601,12 @@ class DALESDataset(PointCloudDataset):
 
         return input_list
 
-    def prepare_DALES_ply(self):
+    def prepare_DALES_ply(self, from_txt=False):
+        """
+        from_txt: True or False, marks whether we have the dales txt files that need to be converted to ply.
+            if False, mark missing files
+            if True, attempt to convert missing files
+        """
 
         print('\nPreparing ply files')
         t0 = time.time()
@@ -623,9 +627,12 @@ class DALESDataset(PointCloudDataset):
                 l = f.readline()
 
             l = f.readline()
-            while f.readline():
+            while l:
                 if l != '\n':
-                    test_files.append(l[:-1])
+                    if l[-1:] == "\n":
+                        test_files.append(l[:-1])
+                    else:
+                        test_files.append(l)
                 l = f.readline()
 
         #go through the training directory and create ply files from the .txt and .label files
@@ -639,13 +646,16 @@ class DALESDataset(PointCloudDataset):
 
         for f in train_files:
             # check to see if file has already been created
-            if f + '.ply' not in listdir(output_path):                
-                p = join(train_path, f)
-                c = np.loadtxt(p + '.txt')
-                l = np.loadtxt(p + '.labels')
-                o = join(output_path, f)
-                write_ply(o, [c.astype(np.float32), l.astype(np.int32)], ['x','y','z','class'])
-                print(f + '.ply')
+            if f + '.ply' not in listdir(output_path):
+                if from_txt:
+                    p = join(train_path, f)
+                    c = np.loadtxt(p + '.txt')
+                    l = np.loadtxt(p + '.labels')
+                    o = join(output_path, f)
+                    write_ply(o, [c.astype(np.float32), l.astype(np.int32)], ['x','y','z','class'])
+                    print(f + '.ply')
+                else:
+                    print(f + ".ply not in directory.")
             
         test_path = join(self.path, "test")
         output_path = join(ply_path, "test")
@@ -656,12 +666,15 @@ class DALESDataset(PointCloudDataset):
 
         for f in test_files:
             if f + ".ply" not in listdir(output_path):
-                p = join(test_path, f)
-                o = join(output_path, f)
-                c = np.loadtxt(p + '.txt')
-                l = np.loadtxt(p + '.labels')
-                write_ply(o, [c.astype(np.float32), l.astype(np.int32)], ['x','y','z','class'])
-                print(f + '.ply')
+                if from_txt:
+                    p = join(test_path, f)
+                    o = join(output_path, f)
+                    c = np.loadtxt(p + '.txt')
+                    l = np.loadtxt(p + '.labels')
+                    write_ply(o, [c.astype(np.float32), l.astype(np.int32)], ['x','y','z','class'])
+                    print(f + '.ply')
+                else:
+                    print(f+ ".ply not in directory.")
         
         print('Done in {:.1f}s'.format(time.time() - t0))
 
