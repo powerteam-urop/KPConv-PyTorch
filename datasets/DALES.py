@@ -63,20 +63,23 @@ class DALESDataset(PointCloudDataset):
         ############
 
         # Dict from labels to names
-        self.label_to_names = {1: 'ground',
-                               2: 'vegetation',
-                               3: 'cars',
-                               4: 'trucks',
-                               5: 'power_lines',
-                               6: 'fences',
-                               7: 'poles',
-                               8: 'buildings',}
+        self.label_to_names = {
+                                0: 'unlabeled',
+                                1: 'ground',
+                                2: 'vegetation',
+                                3: 'cars',
+                                4: 'trucks',
+                                5: 'power_lines',
+                                6: 'fences',
+                                7: 'poles',
+                                8: 'buildings',
+                            }
 
         # Initialize a bunch of variables concerning class labels
         self.init_labels()
 
         # List of classes ignored during training (can be empty)
-        self.ignored_labels = np.array([])
+        self.ignored_labels = np.array([0])
 
         # Dataset folder
         self.path = 'Data/DALES'
@@ -326,7 +329,6 @@ class DALESDataset(PointCloudDataset):
 
             # Collect labels and colors
             input_points = (points[input_inds] - center_point).astype(np.float32)
-            input_colors = self.input_colors[cloud_ind][input_inds]
             if self.set in ['test', 'ERF']:
                 input_labels = np.zeros(input_points.shape[0])
             else:
@@ -338,12 +340,8 @@ class DALESDataset(PointCloudDataset):
             # Data augmentation
             input_points, scale, R = self.augmentation_transform(input_points)
 
-            # Color augmentation
-            if np.random.rand() > self.config.augment_color:
-                input_colors *= 0
-
             # Get original height as additional feature
-            input_features = np.hstack((input_colors, input_points[:, 2:] + center_point[:, 2:])).astype(np.float32)
+            input_features = np.hstack((input_points[:, 2:] + center_point[:, 2:])).astype(np.float32)
 
             t += [time.time()]
 
@@ -519,7 +517,6 @@ class DALESDataset(PointCloudDataset):
 
             # Collect labels and colors
             input_points = (points[input_inds] - center_point).astype(np.float32)
-            input_colors = self.input_colors[cloud_ind][input_inds]
             if self.set in ['test', 'ERF']:
                 input_labels = np.zeros(input_points.shape[0])
             else:
@@ -529,12 +526,8 @@ class DALESDataset(PointCloudDataset):
             # Data augmentation
             input_points, scale, R = self.augmentation_transform(input_points)
 
-            # Color augmentation
-            if np.random.rand() > self.config.augment_color:
-                input_colors *= 0
-
             # Get original height as additional feature
-            input_features = np.hstack((input_colors, input_points[:, 2:] + center_point[:, 2:])).astype(np.float32)
+            input_features = np.hstack((input_points[:, 2:] + center_point[:, 2:])).astype(np.float32)
 
             # Stack batch
             p_list += [input_points]
