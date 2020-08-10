@@ -59,7 +59,7 @@ class DALESConfig(Config):
     dataset_task = ''
 
     # Number of CPU threads for the input pipeline
-    input_threads = 10
+    input_threads = 20
 
     #########################
     # Architecture definition
@@ -109,7 +109,7 @@ class DALESConfig(Config):
     deform_radius = 6.0
 
     # Radius of the area of influence of each kernel point in "number grid cell". (1.0 is the standard value)
-    KP_extent = 1.2
+    KP_extent = 1.0
 
     # Behavior of convolutions in ('constant', 'linear', 'gaussian')
     KP_influence = 'linear'
@@ -118,7 +118,7 @@ class DALESConfig(Config):
     aggregation_mode = 'sum'
 
     # Choice of input features
-    first_features_dim = 128
+    first_features_dim = 64
     in_features_dim = 1
 
     # Can the network learn modulations
@@ -126,7 +126,7 @@ class DALESConfig(Config):
 
     # Batch normalization parameters
     use_batch_norm = True
-    batch_norm_momentum = 0.02
+    batch_norm_momentum = 0.980
 
     # Deformable offset loss
     # 'point2point' fitting geometry by penalizing distance from deform point to input points
@@ -141,16 +141,16 @@ class DALESConfig(Config):
     #####################
 
     # Maximal number of epochs
-    max_epoch = 600
+    max_epoch = 850
 
     # Learning rate management
-    learning_rate = 1e-2
+    learning_rate = 0.010000
     momentum = 0.98
     lr_decays = {i: 0.1 ** (1 / 150) for i in range(1, max_epoch)}
     grad_clip_norm = 100.0
 
     # Number of batch
-    batch_num = 8
+    batch_num = 4
 
     # Number of steps per epochs
     epoch_steps = 741
