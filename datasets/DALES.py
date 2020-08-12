@@ -79,7 +79,7 @@ class DALESDataset(PointCloudDataset):
         self.init_labels()
 
         # List of classes ignored during training (can be empty)
-        self.ignored_labels = np.array([0])
+        self.ignored_labels = np.array([])
 
         # Dataset folder
         self.path = 'Data/DALES'
@@ -105,6 +105,10 @@ class DALESDataset(PointCloudDataset):
 
         # List of files to process
         ply_path = join(self.path, self.train_path)
+
+
+        self.validation_split = 0
+        self.all_splits = [0]
 
         # Number of models used per epoch
         if self.set == 'training':

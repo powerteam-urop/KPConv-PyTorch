@@ -101,6 +101,9 @@ class ADALESDataset(PointCloudDataset):
         # List of files to process
         ply_path = join(self.path, self.train_path)
 
+        self.validation_split = 0
+        self.all_splits = [0]
+
         # Number of models used per epoch
         if self.set == 'training':
             self.epoch_n = config.epoch_steps * config.batch_num
@@ -112,7 +115,7 @@ class ADALESDataset(PointCloudDataset):
         # Stop data is not needed
         if not load_data:
             return
-
+        
         ###################
         # Prepare ply files
         ###################
