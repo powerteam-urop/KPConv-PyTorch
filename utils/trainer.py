@@ -122,7 +122,7 @@ class ModelTrainer:
     # Training main method
     # ------------------------------------------------------------------------------------------------------------------
 
-    def train(self, net, training_loader, val_loader, config):
+    def train(self, net, training_loader, val_loader, config, time_limit=float('inf')):
         """
         Train the model on a particular dataset.
         """
@@ -159,8 +159,11 @@ class ModelTrainer:
         # Start training loop
         for epoch in range(config.max_epoch):
 
+            current_time = time.time()
+            elapsed_time = current_time - t0
+
             # Remove File for kill signal
-            if epoch == config.max_epoch - 1 and exists(PID_file):
+            if (epoch == config.max_epoch - 1 and exists(PID_file)) or elapsed_time >= time_limit:
                 remove(PID_file)
 
             self.step = 0
