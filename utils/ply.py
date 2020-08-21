@@ -48,8 +48,8 @@ ply_dtypes = dict([
 ])
 
 # Numpy reader format
-valid_formats = {'ascii': '', 'binary_big_endian': '>',
-                 'binary_little_endian': '<'}
+valid_formats = {'ascii': '', 'binary_big_endian': '<',
+                 'binary_little_endian': '>'}
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -159,8 +159,6 @@ def read_ply(filename, triangular_mesh=False):
 
         # get binary_little/big or ascii
         fmt = plyfile.readline().split()[1].decode()
-        if fmt == "ascii":
-            raise ValueError('The file is not binary')
 
         # get extension for building the numpy dtypes
         ext = valid_formats[fmt]
@@ -187,12 +185,26 @@ def read_ply(filename, triangular_mesh=False):
 
         else:
 
-            # Parse header
-            num_points, properties = parse_header(plyfile, ext)
+            if fmt == "ascii":
 
-            # Get data
-            data = np.fromfile(plyfile, dtype=properties, count=num_points)
+                data = read_ply_ascii(filename, ext)
 
+            else:
+                # Parse header
+                num_points, properties = parse_header(plyfile, ext)
+
+
+                # Get data
+                data = np.fromfile(plyfile, dtype=properties, count=num_points)
+
+    return data
+
+def read_ply_ascii(filename, ext):
+    with open(filename, 'r') as plyfile:
+        line = plyfile.readline()
+        while "end_header" not in line:
+            line = plyfile.readline()
+        data = np.loadtxt(plyfile)
     return data
 
 
@@ -353,3 +365,20 @@ def describe_element(name, df):
             element.append('property ' + f + ' ' + df.columns.values[i])
 
     return element
+
+if __name__=="__main__":
+    out = read_ply("out.ply")
+    print(type(out))
+    print(out.shape)
+    print(len(out))
+    print(out[0])
+    print(out[0].shape)
+
+    # f = open("5080_54435.ply", "r")
+    # print(f.readline())
+    # f.close()
+
+    # out = read_ply("5080_54435.ply")
+    # print(type(out))
+    # print(len(out))
+    # print(out[0])

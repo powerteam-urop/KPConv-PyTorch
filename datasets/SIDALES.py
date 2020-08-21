@@ -109,7 +109,10 @@ class SIDALESDataset(PointCloudDataset):
             self.epoch_n = config.validation_size * config.batch_num
         else:
             raise ValueError('Unknown set for SIDALES data: ', self.set)
-
+        
+        self.validation_split = 0
+        self.all_splits = [0]
+        
         # Stop data is not needed
         if not load_data:
             return
@@ -687,10 +690,12 @@ class SIDALESDataset(PointCloudDataset):
 
                 # Read ply file
                 data = read_ply(file_path)
+                print(file_path)
                 points = np.vstack((data['x'], data['y'], data['z'])).T
                 labels = data['class'].astype(np.int32)
-                intensity = data['intensity'].astype(np.float32)
-
+                intensity = data['intensity'].reshape(-1,1)
+                print(intensity[0])
+                
                 # Subsample cloud
                 sub_points, sub_intensity, sub_labels = grid_subsampling(points,
                                                         features=intensity,
@@ -707,7 +712,7 @@ class SIDALESDataset(PointCloudDataset):
                 # Save KDTree
                 with open(KDTree_file, 'wb') as f:
                     pickle.dump(search_tree, f)
-
+                
                 # Save ply
                 write_ply(sub_ply_file,
                           [sub_points, sub_intensity, sub_labels],

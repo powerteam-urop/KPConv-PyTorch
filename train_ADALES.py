@@ -100,7 +100,7 @@ class ADALESConfig(Config):
     num_kernel_points = 15
 
     # Size of the first subsampling grid in meter
-    first_subsampling_dl = 0.25
+    first_subsampling_dl = 0.500
 
     # Radius of convolution in "number grid cell". (2.5 is the standard value)
     conv_radius = 2.5
@@ -150,7 +150,7 @@ class ADALESConfig(Config):
     grad_clip_norm = 100.0
 
     # Number of batch
-    batch_num = 2
+    batch_num = 4 
 
     # Number of steps per epochs
     epoch_steps = 741
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     # Choose here if you want to start training from a previous snapshot (None for new training)
     # previous_training_path = 'Log_2020-03-19_19-53-27'
-    previous_training_path = ''
+    previous_training_path = 'Log_2020-08-12_22-04-25'
 
     # Choose index of checkpoint to start from. If None, uses the latest chkp
     chkp_idx = None
@@ -301,7 +301,7 @@ if __name__ == '__main__':
     print('**************')
 
     # Training
-    trainer.train(net, training_loader, test_loader, config, time_limit=36000)
+    trainer.train(net, training_loader, test_loader, config)
 
     print('Forcing exit now')
     os.kill(os.getpid(), signal.SIGINT)
