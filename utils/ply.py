@@ -48,8 +48,8 @@ ply_dtypes = dict([
 ])
 
 # Numpy reader format
-valid_formats = {'ascii': '', 'binary_big_endian': '<',
-                 'binary_little_endian': '>'}
+valid_formats = {'ascii': '', 'binary_big_endian': '>',
+                 'binary_little_endian': '<'}
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -116,27 +116,21 @@ def parse_mesh_header(plyfile, ext):
 def read_ply(filename, triangular_mesh=False):
     """
     Read ".ply" files
-
     Parameters
     ----------
     filename : string
         the name of the file to read.
-
     Returns
     -------
     result : array
         data stored in the file
-
     Examples
     --------
     Store data in file
-
     >>> points = np.random.rand(5, 3)
     >>> values = np.random.randint(2, size=10)
     >>> write_ply('example.ply', [points, values], ['x', 'y', 'z', 'values'])
-
     Read the file
-
     >>> data = read_ply('example.ply')
     >>> values = data['values']
     array([0, 0, 1, 1, 0])
@@ -147,7 +141,6 @@ def read_ply(filename, triangular_mesh=False):
            [ 0.850  0.018  0.988]
            [ 0.395  0.394  0.363]
            [ 0.873  0.996  0.092]])
-
     """
 
     with open(filename, 'rb') as plyfile:
@@ -159,6 +152,8 @@ def read_ply(filename, triangular_mesh=False):
 
         # get binary_little/big or ascii
         fmt = plyfile.readline().split()[1].decode()
+        if fmt == "ascii":
+            raise ValueError('The file is not binary')
 
         # get extension for building the numpy dtypes
         ext = valid_formats[fmt]
@@ -185,26 +180,12 @@ def read_ply(filename, triangular_mesh=False):
 
         else:
 
-            if fmt == "ascii":
+            # Parse header
+            num_points, properties = parse_header(plyfile, ext)
 
-                data = read_ply_ascii(filename, ext)
+            # Get data
+            data = np.fromfile(plyfile, dtype=properties, count=num_points)
 
-            else:
-                # Parse header
-                num_points, properties = parse_header(plyfile, ext)
-
-
-                # Get data
-                data = np.fromfile(plyfile, dtype=properties, count=num_points)
-
-    return data
-
-def read_ply_ascii(filename, ext):
-    with open(filename, 'r') as plyfile:
-        line = plyfile.readline()
-        while "end_header" not in line:
-            line = plyfile.readline()
-        data = np.loadtxt(plyfile)
     return data
 
 
@@ -229,34 +210,27 @@ def header_properties(field_list, field_names):
 def write_ply(filename, field_list, field_names, triangular_faces=None):
     """
     Write ".ply" files
-
     Parameters
     ----------
     filename : string
         the name of the file to which the data is saved. A '.ply' extension will be appended to the 
         file name if it does no already have one.
-
     field_list : list, tuple, numpy array
         the fields to be saved in the ply file. Either a numpy array, a list of numpy arrays or a 
         tuple of numpy arrays. Each 1D numpy array and each column of 2D numpy arrays are considered 
         as one field. 
-
     field_names : list
         the name of each fields as a list of strings. Has to be the same length as the number of 
         fields.
-
     Examples
     --------
     >>> points = np.random.rand(10, 3)
     >>> write_ply('example1.ply', points, ['x', 'y', 'z'])
-
     >>> values = np.random.randint(2, size=10)
     >>> write_ply('example2.ply', [points, values], ['x', 'y', 'z', 'values'])
-
     >>> colors = np.random.randint(255, size=(10,3), dtype=np.uint8)
     >>> field_names = ['x', 'y', 'z', 'red', 'green', 'blue', values']
     >>> write_ply('example3.ply', [points, colors, values], field_names)
-
     """
 
     # Format list input to the right form
@@ -342,12 +316,10 @@ def write_ply(filename, field_list, field_names, triangular_faces=None):
 
 def describe_element(name, df):
     """ Takes the columns of the dataframe and builds a ply-like description
-
     Parameters
     ----------
     name: str
     df: pandas DataFrame
-
     Returns
     -------
     element: list[str]
@@ -365,20 +337,3 @@ def describe_element(name, df):
             element.append('property ' + f + ' ' + df.columns.values[i])
 
     return element
-
-if __name__=="__main__":
-    out = read_ply("out.ply")
-    print(type(out))
-    print(out.shape)
-    print(len(out))
-    print(out[0])
-    print(out[0].shape)
-
-    # f = open("5080_54435.ply", "r")
-    # print(f.readline())
-    # f.close()
-
-    # out = read_ply("5080_54435.ply")
-    # print(type(out))
-    # print(len(out))
-    # print(out[0])
