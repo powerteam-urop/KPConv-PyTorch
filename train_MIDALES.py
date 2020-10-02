@@ -150,7 +150,7 @@ class MIDALESConfig(Config):
     grad_clip_norm = 100.0
 
     # Number of batch
-    batch_num = 2
+    batch_num = 4 
 
     # Number of steps per epochs
     epoch_steps = 741

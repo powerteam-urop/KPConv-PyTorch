@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     # Choose here if you want to start training from a previous snapshot (None for new training)
     # previous_training_path = 'Log_2020-03-19_19-53-27'
-    previous_training_path = 'Log_2020-08-12_22-04-25'
+    previous_training_path = None
 
     # Choose index of checkpoint to start from. If None, uses the latest chkp
     chkp_idx = None

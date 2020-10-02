@@ -100,7 +100,7 @@ class DALESConfig(Config):
     num_kernel_points = 15
 
     # Size of the first subsampling grid in meter
-    first_subsampling_dl = 0.25
+    first_subsampling_dl = 0.5
 
     # Radius of convolution in "number grid cell". (2.5 is the standard value)
     conv_radius = 2.5
@@ -150,7 +150,7 @@ class DALESConfig(Config):
     grad_clip_norm = 100.0
 
     # Number of batch
-    batch_num = 2 
+    batch_num = 4 
 
     # Number of steps per epochs
     epoch_steps = 741 
